@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>مغامرة أدغال المعرفة - كنز الهمزات</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Tahoma,"Segoe UI",sans-serif;background:linear-gradient(135deg,#145a32,#2e7d32,#66bb6a);color:#fff;text-align:center;margin:0;padding:18px}
+.game-container{max-width:720px;margin:18px auto;background:rgba(255,255,255,.97);color:#333;padding:28px;border-radius:24px;box-shadow:0 12px 30px #0005;border:4px solid #ffb300}
+h1{color:#d84315;font-size:29px;margin:5px 0 10px}.player-tag{background:#ffb300;color:#fff;padding:7px 17px;border-radius:20px;font-weight:bold;display:inline-block}
+.scorebar{display:flex;justify-content:space-between;gap:10px;margin:18px 0;flex-wrap:wrap}.badge{background:#fff3cd;padding:8px 14px;border-radius:15px;color:#8d4b00;font-weight:bold}
+.stage-title{color:#2e7d32;font-size:21px;margin:12px 0;font-weight:bold}.question-box{font-size:21px;line-height:1.8;font-weight:600;margin:16px 0}
+.example{background:#f1f8e9;border-right:6px solid #43a047;border-radius:12px;padding:14px;margin:15px 0;font-size:22px}
+.options{display:flex;flex-direction:column;gap:12px}.btn{background:#43a047;color:white;border:0;padding:15px;font-size:18px;border-radius:12px;cursor:pointer;font-weight:bold;box-shadow:0 4px 6px #0002;transition:.2s}.btn:hover{background:#2e7d32;transform:translateY(-2px)}.btn:disabled{opacity:.75;cursor:default;transform:none}
+.hidden{display:none}#feedback{font-size:20px;font-weight:bold;margin-top:18px;min-height:32px}.progress{height:12px;background:#ddd;border-radius:20px;overflow:hidden;margin:12px 0}.progress span{display:block;height:100%;background:#ffb300;width:0;transition:.4s}
+.treasure{font-size:65px;margin:18px 0;animation:bounce 1s infinite alternate}.signature{margin-top:25px;color:#777;font-size:14px}
+@keyframes bounce{from{transform:translateY(0)}to{transform:translateY(-10px)}}
+</style>
+</head>
+<body>
+<div class="game-container">
+<h1>🌴 مغامرة أدغال المعرفة 🌴</h1>
+<div class="player-tag">🏅 البطل المغامر: القاسم البادي</div>
+
+<div id="game-area">
+<div class="scorebar">
+<div class="badge" id="score">⭐ النقاط: 0</div>
+<div class="badge" id="counter">🎯 السؤال: 1 / 10</div>
+</div>
+<div class="progress"><span id="progress"></span></div>
+</div>
+
+<div id="start-screen">
+<p class="question-box">مرحباً بك يا قاسم في مغامرة <b>همزتي القطع والوصل</b>! 🌿<br>
+أجب عن الأسئلة، واجتز الأدغال، واجمع النجوم حتى تصل إلى الكنز. 💎</p>
+<button class="btn" onclick="startAdventure()">🚀 ابدأ المغامرة الآن!</button>
+</div>
+
+<div id="game-screen" class="hidden">
+<div id="stage-indicator" class="stage-title"></div>
+<div id="question" class="question-box"></div>
+<div id="example" class="example hidden"></div>
+<div id="options" class="options"></div>
+<div id="feedback"></div>
+</div>
+
+<div id="end-screen" class="hidden">
+<div class="treasure">🏆💎🗝️</div>
+<h2>مبروك يا قاسم! 🎉</h2>
+<p class="question-box">لقد وصلت إلى الكنز وأثبتَّ مهارتك في همزتي القطع والوصل.</p>
+<p id="final-score" class="badge"></p>
+<p id="final-message" class="question-box"></p>
+<button class="btn" onclick="location.reload()">🔄 العب مرة أخرى</button>
+</div>
+
+<div class="signature">إعداد: أ. سمية البادي</div>
+</div>
+
+<script>
+const stages=[
+{title:"المرحلة الأولى: نهر التماسيح 🐊",q:"أي كلمة تبدأ بهمزة قطع؟",options:[["استمع",false],["أحمد",true],["اكتب",false]]},
+{title:"المرحلة الثانية: غابة الكلمات 🌴",q:"أي كلمة تبدأ بهمزة وصل؟",options:[["إيمان",false],["أكرم",false],["انطلق",true]]},
+{title:"المرحلة الثالثة: جسر القرد المشاكس 🐒",q:"اقرأ الجملة: «أحبُّ أن أقرأَ القصةَ.» ما الكلمات التي تبدأ بهمزة قطع؟",options:[["أحبُّ، أن، أقرأَ",true],["القصةَ فقط",false],["أحبُّ فقط",false]]},
+{title:"المرحلة الرابعة: شلال المغامرة 💦",q:"اختر الكلمة التي تبدأ بهمزة وصل:",options:[["استخدم",true],["إكرام",false],["أميرة",false]]},
+{title:"المرحلة الخامسة: كهف الأسرار 🗝️",q:"في الجملة: «استيقظَ خالدٌ مبكرًا.» ما نوع الهمزة في كلمة «استيقظ»؟",options:[["همزة قطع",false],["همزة وصل",true],["همزة متطرفة",false]]},
+{title:"المرحلة السادسة: طريق النخيل 🌴",q:"أي جملة تحتوي كلمة تبدأ بهمزة قطع؟",options:[["اكتبْ واجبك.",false],["استمعْ إلى المعلمة.",false],["أحضرَ سالمٌ كتابه.",true]]},
+{title:"المرحلة السابعة: كهف الاختيار 🦜",q:"أكمل الجملة: «_____ الطالبُ واجبه.» اختر الكلمة الصحيحة.",options:[["أنجزَ",true],["انجزَ",false],["استنجزَ",false]]},
+{title:"المرحلة الثامنة: بوابة الأبطال 🚪",q:"في الجملة: «ابنُ خالدٍ مجتهدٌ.» ما نوع الهمزة في كلمة «ابن»؟",options:[["همزة قطع",false],["همزة وصل",true],["همزة متطرفة",false]]},
+{title:"المرحلة التاسعة: اختبار السرعة ⚡",q:"أي مجموعة تحتوي كلمات تبدأ كلها بهمزة وصل؟",options:[["اكتب، اجلس، استخرج",true],["أحمد، إيمان، أكل",false],["أب، ابن، أم",false]]},
+{title:"المرحلة العاشرة: مفتاح الكنز 💎",q:"لماذا تُعدّ همزة «أخذ» همزة قطع؟",options:[["لأنها تُنطق وتُكتب في أول الكلام ووصله",true],["لأنها تسقط عند وصل الكلام",false],["لأن كلمة أخذ من الأسماء السبعة",false]]}
+];
+
+let currentStage=0,score=0;
+
+function startAdventure(){
+ document.getElementById("start-screen").classList.add("hidden");
+ document.getElementById("game-screen").classList.remove("hidden");
+ loadStage();
+}
+function loadStage(){
+ if(currentStage>=stages.length){finishGame();return}
+ const s=stages[currentStage];
+ document.getElementById("stage-indicator").innerText=s.title;
+ document.getElementById("question").innerText=s.q;
+ document.getElementById("feedback").innerText="";
+ document.getElementById("counter").innerText="🎯 السؤال: "+(currentStage+1)+" / "+stages.length;
+ document.getElementById("progress").style.width=((currentStage)/stages.length*100)+"%";
+ const box=document.getElementById("options");box.innerHTML="";
+ s.options.forEach(([text,correct])=>{
+   const b=document.createElement("button");b.className="btn";b.innerText=text;
+   b.onclick=()=>checkAnswer(correct);
+   box.appendChild(b);
+ });
+}
+function checkAnswer(correct){
+ const feedback=document.getElementById("feedback");
+ if(correct){
+   score++;
+   document.getElementById("score").innerText="⭐ النقاط: "+score;
+   feedback.style.color="#2e7d32";
+   feedback.innerText="🌟 إجابة صحيحة! أحسنت يا قاسم!";
+   document.querySelectorAll("#options .btn").forEach(b=>b.disabled=true);
+   currentStage++;
+   setTimeout(loadStage,1000);
+ }else{
+   feedback.style.color="#d84315";
+   feedback.innerText="❌ ليست الإجابة الصحيحة. حاول مرة أخرى يا بطل!";
+ }
+}
+function finishGame(){
+ document.getElementById("game-screen").classList.add("hidden");
+ document.getElementById("end-screen").classList.remove("hidden");
+ document.getElementById("progress").style.width="100%";
+ document.getElementById("final-score").innerText="⭐ نتيجتك: "+score+" من "+stages.length;
+ let msg=score===stages.length?"رائع! أكملت جميع المراحل دون خطأ! 🏆":
+ score>=8?"ممتاز! مهارتك في الهمزات قوية جدًا! 🌟":
+ score>=6?"أحسنت! لديك أساس جيد، واصل التدريب! 👏":
+ "بداية جميلة! أعد المغامرة وحاول جمع نجوم أكثر! 🌱";
+ document.getElementById("final-message").innerText=msg;
+}
+</script>
+</body>
+</html>
